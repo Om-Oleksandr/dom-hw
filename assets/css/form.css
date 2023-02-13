@@ -1,0 +1,31 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  max-width: 300px;
+  width: 90%;
+  margin: auto;
+  row-gap: 10px;
+}
+
+.form input[type="text"] {
+  border: none;
+  padding: 0.5em;
+}
+
+.form input:focus {
+  /* outline: 1px solid aquamarine; */
+  outline-color: aquamarine;
+  border-radius: 5px;
+}
+
+ul {
+  list-style: none;
+  max-width: 250px;
+  width: 90%;
+  margin: 50px auto 0;
+}
+li{
+  display: flex;
+  margin-top: 15px;
+  justify-content: space-between;
+}
