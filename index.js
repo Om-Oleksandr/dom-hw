@@ -18,19 +18,6 @@ socialMap.set("www.instagram.com", "fa-brands fa-instagram");
 socialMap.set("www.facebook.com", "fa-brands fa-facebook");
 socialMap.set("twitter.com", "fa-brands fa-twitter");
 
-const user = {
-  id: 1,
-  firstName: "Jason",
-  lastName: "Statham",
-  profilePicture:
-    "https://i.pinimg.com/orignals/24/f5/f8/24f5f8ef9f8af9c7e795ff0ba15f6881.jpg",
-  contacts: [
-    "https://www.facebook.com/JasonStatham/",
-    "https://twitter.com/realjstatham",
-    "https://www.instagram.com/jasonstatham/?hl=ru",
-  ],
-};
-
 const promise = fetch("./assets/js/data.json");
 
 promise.then((response) => {
@@ -99,11 +86,8 @@ function addToPickList({ target }) {
   const list = document.querySelector(".your__pick ul");
   if (pickedActors.includes(target.textContent) === false) {
     pickedActors.push(target.textContent);
-    createPickedList(target.textContent);
     list.append(createPickedList(target.textContent));
-    console.log("array", pickedActors);
   }
-  console.log(target);
 }
 function createPickedList(picked) {
   return createElement("li", {}, picked);
