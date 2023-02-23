@@ -1,73 +1,125 @@
 "use strict";
-const body = document.body;
-const resetTimeout = document.getElementById("subscribe");
+const pickedActors = [];
+const rootElement = document.getElementById("wrapper");
+const cardContainer = createElement("div", {
+  classNames: ["user__cards", "container"],
+});
+const pickList = createElement(
+  "div",
+  { classNames: ["your__pick"] },
+  createElement("span", {}, "your pick"),
+  createElement("ul", {})
+);
+rootElement.append(cardContainer);
+rootElement.append(pickList);
 
-const idTimeout = setTimeout(() => {
-  body.append(createPopUp());
-  body.style.overflow = "hidden";
-}, 3000);
-resetTimeout.addEventListener("click", () => {
-  clearTimeout(idTimeout);
+const socialMap = new Map();
+socialMap.set("www.instagram.com", "fa-brands fa-instagram");
+socialMap.set("www.facebook.com", "fa-brands fa-facebook");
+socialMap.set("twitter.com", "fa-brands fa-twitter");
+
+const user = {
+  id: 1,
+  firstName: "Jason",
+  lastName: "Statham",
+  profilePicture:
+    "https://i.pinimg.com/orignals/24/f5/f8/24f5f8ef9f8af9c7e795ff0ba15f6881.jpg",
+  contacts: [
+    "https://www.facebook.com/JasonStatham/",
+    "https://twitter.com/realjstatham",
+    "https://www.instagram.com/jasonstatham/?hl=ru",
+  ],
+};
+
+const promise = fetch("./assets/js/data.json");
+
+promise.then((response) => {
+  const responsePromise = response.json();
+
+  responsePromise
+    .then((users) => {
+      const userCard = users
+        .filter((user) => user.firstName && user.lastName)
+        .map((user) => createUserCard(user));
+      cardContainer.append(...userCard);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
-function createPopUp() {
+function errorLoadImage({ target }) {
+  target.parentElement.append(createElement("span", {}, "no photo"));
+  target.remove();
+}
+
+function loadImage({ target }) {
+  target.classList.add("user__image");
+}
+
+function createUserCard(user) {
+  const arrLinks = user.contacts.map((path) => {
+    const { hostname } = new URL(path);
+    return createElement(
+      "li",
+      { classNames: ["user__card-socials-item"] },
+      createElement("a", {
+        classNames: [...socialMap.get(hostname).split(" "), "social__link"],
+        attributes: { href: path, target: "_blank" },
+      })
+    );
+  });
   return createElement(
     "div",
-    {
-      classNames: ["popup__container"],
-      listeners: { click: areaClosePopUp },
-    },
+    { classNames: ["user__card-item"] },
     createElement(
       "div",
-      { classNames: ["popup__content"] },
-      createElement("input", { attributes: { type: "text" } }),
-      createElement(
-        "button",
-        { classNames: ["subscribe"], listeners: { click: buttonClosePopUp } },
-        "subscribe"
-      )
-    )
+      { classNames: ["user__card-image"] },
+      createElement("img", {
+        listeners: { error: errorLoadImage, load: loadImage },
+        attributes: { src: user.profilePicture },
+      })
+    ),
+    createElement(
+      "span",
+      {
+        classNames: ["user__card-name"],
+        listeners: { click: addToPickList },
+        attributes: { title: "pick" },
+      },
+      user.firstName,
+      " ",
+      user.lastName
+    ),
+    createElement("ul", { classNames: ["user__card-socials"] }, ...arrLinks)
   );
 }
 
-function areaClosePopUp({ target }) {
-  if (target === target.closest(".popup__container")) {
-    target.remove();
-    body.style.overflow = "auto";
+function addToPickList({ target }) {
+  const list = document.querySelector(".your__pick ul");
+  if (pickedActors.includes(target.textContent) === false) {
+    pickedActors.push(target.textContent);
+    createPickedList(target.textContent);
+    list.append(createPickedList(target.textContent));
+    console.log("array", pickedActors);
   }
+  console.log(target);
+}
+function createPickedList(picked) {
+  return createElement("li", {}, picked);
 }
 
-function buttonClosePopUp({
-  target: {
-    parentElement: { parentElement: grandParent },
-  },
-}) {
-  grandParent.remove();
-  body.style.overflow = "auto";
-}
+// rootElement.append(createUserCard(user));
 
-function closePopUp(e) {
-  const popUp = document.querySelector(".popup__container");
-  if (e.key === "Escape" && popUp) {
-    popUp.remove();
-    body.style.overflow = "auto";
-  }
-}
-
-window.addEventListener("keydown", closePopUp);
-
-/*
-. any 1 symbol
-[] any 1 from range
-[^] any 1 except from range
-
-{from, to?} 
-
-\d any 1 number
-\w any 1 symbol (letters, numbers, _)
-  \s any 1 space symboll
-
-* => {0, infinity}
-+ => {1, infinity}
-? => {0, 1}
-*/
+// function loadImage(path) {
+//   const newImage = new Image();
+//   newImage.src = path;
+//   return new Promise((resolve, reject) => {
+//     newImage.addEventListener("load", () => {
+//       resolve(newImage);
+//     });
+//     newImage.addEventListener("error", () => {
+//       reject(new Error("path invalid"));
+//     });
+//   });
+// }
